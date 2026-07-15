@@ -4,12 +4,6 @@ Diese Anleitung ist für alle gedacht, die Termine (Übungsdienste etc.) über d
 Web-Oberfläche bei Groupalarm anlegen dürfen. Sie bekommen diese Anleitung zusammen mit
 einer Einladungs-Mail vom Admin.
 
-> **Admin-Hinweis:** Diese Datei kann so, wie sie ist, an neue User weitergegeben
-> werden. Screenshots müssen nur einmal erstellt und in `docs/screenshots/` abgelegt
-> werden (Dateinamen siehe Platzhalter unten) - danach werden sie hier automatisch
-> mitangezeigt (z.B. wenn diese Datei in einem Wiki, GitHub o.ä. gerendert wird), oder
-> einfach als PDF/ausgedruckt weitergeben.
-
 ---
 
 ## 1. Zugang erhalten
@@ -38,8 +32,6 @@ deinem Namen Termine anlegen darf.
 
 ![Screenshot: Wo man in Groupalarm den API-Token/Personal-Access-Token generiert](screenshots/groupalarm-api-token.png)
 
-*(Platzhalter - Screenshot vom Admin einzufügen: `docs/screenshots/groupalarm-api-token.png`)*
-
 **Wichtig:** Der Token wird nur einmal angezeigt - kopiere ihn sofort und füge ihn
 direkt unter **Einstellungen → Groupalarm API-Token** in der Anwendung ein. Die
 Anwendung zeigt ihn danach nie wieder im Klartext an (nur "konfiguriert" bzw.
@@ -48,8 +40,6 @@ Anwendung zeigt ihn danach nie wieder im Klartext an (nur "konfiguriert" bzw.
 ### 2.2 Organisation-ID finden
 
 ![Screenshot: Wo man in Groupalarm die Organisation-ID findet](screenshots/groupalarm-organisation-id.png)
-
-*(Platzhalter - Screenshot vom Admin einzufügen: `docs/screenshots/groupalarm-organisation-id.png`)*
 
 Die Organisation-ID trägst du unter **Einstellungen → Organisation-ID** ein.
 
@@ -60,16 +50,8 @@ Wehr", "Jugendfeuerwehr"). Du kannst mehrere Label-IDs angeben.
 
 ![Screenshot: Wo man in Groupalarm die Label-IDs findet](screenshots/groupalarm-label-ids.png)
 
-*(Platzhalter - Screenshot vom Admin einzufügen: `docs/screenshots/groupalarm-label-ids.png`)*
-
 Trage die Label-IDs unter **Einstellungen → Label-IDs** ein, durch Komma getrennt,
 z.B. `21868, 21840, 21832`.
-
-### (Optional) So sieht die Einstellungsseite in der Anwendung aus
-
-![Screenshot: Einstellungsseite der Anwendung mit Organisation-ID/Label-IDs/API-Token](screenshots/app-einstellungen.png)
-
-*(Platzhalter, optional - Screenshot vom Admin einzufügen: `docs/screenshots/app-einstellungen.png`)*
 
 ---
 

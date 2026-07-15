@@ -37,17 +37,21 @@ function groupalarm_get_decrypted_token(int $userId): ?string
 }
 
 /**
- * Builds the Groupalarm-specific timestamp string: the literal Berlin wall-clock
- * date/time with a "Z" suffix appended - NOT a real UTC conversion. The payload's
- * separate "timezone":"Europe/Berlin" field is what tells Groupalarm how to interpret
- * this. This matches automata.sh's existing (working) behaviour exactly.
- *
- * Do NOT run this through DateTime::setTimezone('UTC') or similar - that would
- * double-convert and shift every appointment by 1-2 hours.
+ * Converts a Europe/Berlin wall-clock date/time (as entered by the user) into the
+ * real UTC timestamp Groupalarm expects. Confirmed against a live test: sending the
+ * literal local time with a bare "Z" suffix (assuming Groupalarm would treat it as
+ * already-local, per automata.sh's apparent behaviour) resulted in appointments
+ * showing up 2 hours later than requested - i.e. Groupalarm genuinely interprets the
+ * "Z" as UTC and converts to Europe/Berlin for display using the payload's separate
+ * "timezone" field. This performs that conversion properly, including DST (CET/CEST),
+ * so the appointment shows at the intended local time regardless of time of year.
  */
-function groupalarm_fake_utc_timestamp(string $date, string $time): string
+function groupalarm_to_utc_timestamp(string $date, string $time): string
 {
-    return sprintf('%sT%s:00Z', $date, $time);
+    $local = new DateTime("{$date} {$time}:00", new DateTimeZone('Europe/Berlin'));
+    $local->setTimezone(new DateTimeZone('UTC'));
+
+    return $local->format('Y-m-d\TH:i:s\Z');
 }
 
 /**
@@ -60,8 +64,8 @@ function groupalarm_build_payload(array $row, int $organizationId, array $labelI
 {
     return [
         'description' => str_replace('\\n', "\n", (string) $row['description']),
-        'startDate' => groupalarm_fake_utc_timestamp($row['date'], $row['start_time']),
-        'endDate' => groupalarm_fake_utc_timestamp($row['date'], $row['end_time']),
+        'startDate' => groupalarm_to_utc_timestamp($row['date'], $row['start_time']),
+        'endDate' => groupalarm_to_utc_timestamp($row['date'], $row['end_time']),
         'isPublic' => false,
         'keepLabelParticipantsInSync' => true,
         'labelIDs' => array_values(array_map('intval', $labelIds)),
