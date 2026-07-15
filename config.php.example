@@ -1,0 +1,37 @@
+<?php
+
+declare(strict_types=1);
+
+// Copy this file to config.php (same directory) and fill in real values.
+// config.php itself is gitignored - never commit real credentials/keys.
+
+// --- Database ---
+define('DB_HOST', 'localhost');
+define('DB_NAME', 'groupalarm_api');
+define('DB_USER', 'groupalarm_api');
+define('DB_PASS', 'change-me');
+define('DB_CHARSET', 'utf8mb4');
+
+// --- App ---
+// No trailing slash. Used to build the links inside password-reset/invite emails.
+define('APP_BASE_URL', 'https://example.com/groupalarm-api/public');
+define('APP_MAIL_FROM', 'groupalarm-api@example.com');
+
+// --- Security ---
+// Path to a file containing exactly 32 random bytes, used as the AES-256-GCM master key
+// for encrypting per-user Groupalarm API tokens at rest. Generate once with:
+//   php -r "file_put_contents('/path/to/master.key', random_bytes(32));"
+// Keep this file OUTSIDE the web root (public/), permissions 600. Losing it makes
+// all stored Groupalarm API tokens unrecoverable (users would need to re-enter them).
+define('GROUPALARM_MASTER_KEY_PATH', __DIR__ . '/secrets/master.key');
+
+// --- Appointment defaults ---
+define('DEFAULT_APPOINTMENT_START_TIME', '19:00');
+define('DEFAULT_APPOINTMENT_END_TIME', '21:00');
+define('DEFAULT_APPOINTMENT_NAME', 'Übungsdienst');
+define('DEFAULT_APPOINTMENT_REMINDER_MINUTES', 2880);
+
+// --- Session / token lifetimes ---
+define('SESSION_IDLE_TIMEOUT_SECONDS', 7200); // 2 hours - keeps a draft alive during upload+review
+define('PASSWORD_RESET_TTL_MINUTES', 10);
+define('INVITE_TTL_HOURS', 48);

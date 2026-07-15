@@ -1,0 +1,18 @@
+{
+  "description": "Testeintrag für die Termineinstellung via Api.\nDas hier sollte eine neue Zeile sein",
+  "endDate": "2026-08-11T19:00:00Z",
+  "isPublic": false,
+  "keepLabelParticipantsInSync": true,
+  "labelIDs": [
+    21868,
+    21840,
+    21832
+  ],
+  "participants": [
+  ],  
+  "name": "Übungsdienst",
+  "organizationID": 8654,
+  "startDate": "2026-08-11T17:00:00Z",
+  "timezone": "Europe/Berlin",
+  "reminder": 2880
+}

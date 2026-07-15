@@ -1,0 +1,6 @@
+config.php
+secrets/
+logs/*.log
+apikey.sec
+*.sec
+.DS_Store
