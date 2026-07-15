@@ -56,9 +56,8 @@ function groupalarm_to_utc_timestamp(string $date, string $time): string
 
 /**
  * Builds the JSON-ready payload array for one appointment.
- * isPublic/keepLabelParticipantsInSync/reminder are fixed to match the existing
- * createAppointment.json template - not part of this app's scope, easy to expose
- * as settings later if needed.
+ * isPublic/keepLabelParticipantsInSync/reminder are fixed to sensible defaults -
+ * not part of this app's scope, easy to expose as settings later if needed.
  */
 function groupalarm_build_payload(array $row, int $organizationId, array $labelIds): array
 {
