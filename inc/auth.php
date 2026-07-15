@@ -103,13 +103,16 @@ function logout(): void
 function create_password_reset_token(int $userId, string $type): string
 {
     $rawToken = bin2hex(random_bytes(32));
-    $hours = $type === 'invite' ? INVITE_TTL_HOURS : (PASSWORD_RESET_TTL_MINUTES / 60);
+    // Both TTLs normalized to whole minutes - INTERVAL ? HOUR with a fractional
+    // value (e.g. 10/60 = 0.1667) gets truncated to 0 by MariaDB, which previously
+    // made every "reset" token expire at the same instant it was created.
+    $minutes = $type === 'invite' ? INVITE_TTL_HOURS * 60 : PASSWORD_RESET_TTL_MINUTES;
 
     $stmt = db()->prepare(
         'INSERT INTO password_resets (user_id, token_hash, type, expires_at)
-         VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? HOUR))'
+         VALUES (?, ?, ?, DATE_ADD(NOW(), INTERVAL ? MINUTE))'
     );
-    $stmt->execute([$userId, hash('sha256', $rawToken), $type, $hours]);
+    $stmt->execute([$userId, hash('sha256', $rawToken), $type, $minutes]);
 
     return $rawToken;
 }

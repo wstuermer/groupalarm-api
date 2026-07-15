@@ -13,8 +13,14 @@ define('DB_PASS', 'change-me');
 define('DB_CHARSET', 'utf8mb4');
 
 // --- App ---
-// No trailing slash. Used to build the links inside password-reset/invite emails.
-define('APP_BASE_URL', 'https://example.com/groupalarm-api/public');
+// The URL that resolves to the CONTENTS of public/ - not the filesystem path. If
+// your vhost's DocumentRoot points directly at public/ (the intended setup, see
+// README/plan), this is just your domain, e.g. 'https://groupalarm.example.org' -
+// do NOT add "/public" here, that would double it up and produce broken links in
+// password-reset/invite emails. Only add a path suffix if your DocumentRoot is the
+// repo root and you're using the public/.htaccess fallback instead.
+// No trailing slash.
+define('APP_BASE_URL', 'https://groupalarm.example.org');
 define('APP_MAIL_FROM', 'groupalarm-api@example.com');
 
 // --- Security ---
