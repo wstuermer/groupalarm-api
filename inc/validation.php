@@ -25,6 +25,21 @@ function is_valid_time(string $time): bool
 }
 
 /**
+ * Normalizes a description as entered by the user: expands the literal two-character
+ * "\n" escape sequence (the appointments.txt convention) into a real newline, and
+ * collapses CRLF/lone-CR line endings down to plain LF. Browsers submit <textarea>
+ * content with CRLF line breaks per the HTML spec regardless of OS, so a description
+ * typed into add_appointment.php's/draft_edit.php's textarea would otherwise carry
+ * stray \r bytes into the Groupalarm payload. Used consistently for validation and
+ * for the payload actually sent to Groupalarm, so both agree on the same text.
+ */
+function normalize_description(string $raw): string
+{
+    $text = str_replace('\\n', "\n", $raw);
+    return preg_replace('/\r\n|\r/', "\n", $text);
+}
+
+/**
  * Validates one draft row (as built by the manual-entry form, the txt parser, or an
  * inline edit) and returns a list of human-readable error strings. Empty array = valid.
  * Called from every place a row is created/edited, and again defensively right before
@@ -58,9 +73,7 @@ function validate_draft_row(array $row): array
         $errors[] = 'Betreff fehlt.';
     }
 
-    // Expand literal "\n" the same way the API client will, so an all-whitespace
-    // description (e.g. just "\n") is correctly caught as empty.
-    $description = str_replace('\\n', "\n", (string) ($row['description'] ?? ''));
+    $description = normalize_description((string) ($row['description'] ?? ''));
     if (trim($description) === '') {
         $errors[] = 'Beschreibung fehlt.';
     }

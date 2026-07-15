@@ -56,7 +56,11 @@ function draft_find_index(string $rowId): ?int
 }
 
 /**
- * Merges $fields into the existing row and re-validates it.
+ * Merges $fields into the existing row and re-validates it - unless $fields itself
+ * explicitly sets 'errors' (used by dashboard.php to attach a Groupalarm API failure
+ * message after a send attempt), in which case that takes precedence instead of being
+ * silently recomputed away: the row's fields are known-valid at that point (only
+ * already-validated rows get sent), so the only error left to show is the API's.
  */
 function draft_update_row(string $rowId, array $fields): bool
 {
@@ -66,7 +70,9 @@ function draft_update_row(string $rowId, array $fields): bool
     }
 
     $row = array_merge($_SESSION['draft'][$index], $fields);
-    $row['errors'] = validate_draft_row($row);
+    if (!array_key_exists('errors', $fields)) {
+        $row['errors'] = validate_draft_row($row);
+    }
     $_SESSION['draft'][$index] = $row;
 
     return true;

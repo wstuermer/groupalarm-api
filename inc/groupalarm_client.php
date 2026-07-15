@@ -63,7 +63,7 @@ function groupalarm_to_utc_timestamp(string $date, string $time): string
 function groupalarm_build_payload(array $row, int $organizationId, array $labelIds): array
 {
     return [
-        'description' => str_replace('\\n', "\n", (string) $row['description']),
+        'description' => normalize_description((string) $row['description']),
         'startDate' => groupalarm_to_utc_timestamp($row['date'], $row['start_time']),
         'endDate' => groupalarm_to_utc_timestamp($row['date'], $row['end_time']),
         'isPublic' => false,
