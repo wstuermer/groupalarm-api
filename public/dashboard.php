@@ -143,12 +143,7 @@ require __DIR__ . '/../templates/header.php';
                 <td><?= $row['source'] === 'upload' ? 'Upload' . ($row['line_number'] ? " (Zeile {$row['line_number']})" : '') : 'Manuell' ?></td>
                 <td class="actions-row">
                     <a href="draft_edit.php?row_id=<?= urlencode($row['row_id']) ?>">Bearbeiten</a>
-                    <form method="post" action="draft_edit.php" data-confirm="Diese Zeile löschen?">
-                        <?php csrf_field(); ?>
-                        <input type="hidden" name="action" value="delete">
-                        <input type="hidden" name="row_id" value="<?= h($row['row_id']) ?>">
-                        <button type="submit" class="btn-danger">Löschen</button>
-                    </form>
+                    <button type="submit" form="delete-form-<?= h($row['row_id']) ?>" class="btn-danger">Löschen</button>
                 </td>
             </tr>
             <?php if ($row['errors']): ?>
@@ -167,6 +162,15 @@ require __DIR__ . '/../templates/header.php';
     </table>
     <button type="submit">Alle fehlerfreien Termine senden</button>
 </form>
+
+<?php foreach ($draft as $row): ?>
+<form id="delete-form-<?= h($row['row_id']) ?>" method="post" action="draft_edit.php"
+      data-confirm="Diese Zeile löschen?" style="display:none">
+    <?php csrf_field(); ?>
+    <input type="hidden" name="action" value="delete">
+    <input type="hidden" name="row_id" value="<?= h($row['row_id']) ?>">
+</form>
+<?php endforeach; ?>
 <?php endif; ?>
 <?php
 require __DIR__ . '/../templates/footer.php';
