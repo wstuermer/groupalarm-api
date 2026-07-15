@@ -126,7 +126,7 @@ require __DIR__ . '/../templates/header.php';
                 <th>Datum</th>
                 <th>Start</th>
                 <th>Ende</th>
-                <th>Titel</th>
+                <th>Betreff</th>
                 <th>Beschreibung</th>
                 <th>Quelle</th>
                 <th>Aktionen</th>

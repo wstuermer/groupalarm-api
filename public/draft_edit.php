@@ -72,7 +72,7 @@ require __DIR__ . '/../templates/header.php';
     <label for="end_time">Endzeit</label>
     <input type="time" id="end_time" name="end_time" value="<?= h($row['end_time']) ?>" required>
 
-    <label for="name">Titel</label>
+    <label for="name">Betreff</label>
     <input type="text" id="name" name="name" value="<?= h($row['name']) ?>" required>
 
     <label for="description">Beschreibung</label>

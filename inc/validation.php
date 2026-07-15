@@ -55,7 +55,7 @@ function validate_draft_row(array $row): array
 
     $name = trim((string) ($row['name'] ?? ''));
     if ($name === '') {
-        $errors[] = 'Titel fehlt.';
+        $errors[] = 'Betreff fehlt.';
     }
 
     // Expand literal "\n" the same way the API client will, so an all-whitespace

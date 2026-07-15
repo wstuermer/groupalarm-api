@@ -48,6 +48,9 @@ require __DIR__ . '/../templates/header.php';
 <p>
     Format: <code>YYYY-MM-DD[ HH:MM-HH:MM] Beschreibung</code> - eine Zeile pro Termin.
     Ohne Zeitangabe gelten <?= h(DEFAULT_APPOINTMENT_START_TIME) ?>-<?= h(DEFAULT_APPOINTMENT_END_TIME) ?> Uhr als Standard.
+    Der Betreff steht nicht in der Datei - jede hochgeladene Zeile bekommt automatisch
+    den Betreff "<?= h(DEFAULT_APPOINTMENT_NAME) ?>", der sich in der Entwurfsliste bei
+    Bedarf pro Termin ändern lässt.
     Zeilen mit <code>#</code> am Anfang sowie Leerzeilen werden ignoriert.
     Die hochgeladenen Zeilen werden <strong>nicht sofort gesendet</strong>, sondern erst
     in der Entwurfsliste zur Prüfung angezeigt.

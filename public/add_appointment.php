@@ -54,8 +54,9 @@ require __DIR__ . '/../templates/header.php';
     <label for="end_time">Endzeit</label>
     <input type="time" id="end_time" name="end_time" value="<?= h($fields['end_time']) ?>" required>
 
-    <label for="name">Titel</label>
+    <label for="name">Betreff</label>
     <input type="text" id="name" name="name" value="<?= h($fields['name']) ?>" required>
+    <p class="field-hint">Standard ist "<?= h(DEFAULT_APPOINTMENT_NAME) ?>", kann hier frei geändert werden.</p>
 
     <label for="description">Beschreibung</label>
     <textarea id="description" name="description" required><?= h($fields['description']) ?></textarea>
