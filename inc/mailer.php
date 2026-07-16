@@ -17,6 +17,7 @@ function mail_send_reset_link(string $toEmail, string $rawToken, string $type): 
             . "für dich wurde ein Zugang zur Groupalarm-Terminverwaltung angelegt.\n"
             . "Bitte vergib über den folgenden Link (48 Stunden gültig) dein Passwort:\n\n"
             . $link . "\n\n"
+            . "Die Anleitung findest du unter https://github.com/wstuermer/groupalarm-api/blob/main/docs/ANLEITUNG.md\n\n"
             . "Falls du diesen Zugang nicht erwartet hast, ignoriere diese Mail einfach.\n";
     } else {
         $subject = 'Passwort zurücksetzen';
