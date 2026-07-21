@@ -4,3 +4,4 @@ logs/*.log
 apikey.sec
 *.sec
 .DS_Store
+docker/local/

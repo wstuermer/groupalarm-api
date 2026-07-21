@@ -5,16 +5,23 @@ declare(strict_types=1);
 require __DIR__ . '/../inc/bootstrap.php';
 require_login();
 
+$userId = (int) current_user()['id'];
+$defaultLabelIds = groupalarm_get_label_ids($userId);
+
 $fields = [
     'date' => '',
     'start_time' => DEFAULT_APPOINTMENT_START_TIME,
     'end_time' => DEFAULT_APPOINTMENT_END_TIME,
     'name' => DEFAULT_APPOINTMENT_NAME,
     'description' => '',
+    'label_ids' => $defaultLabelIds,
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     csrf_verify();
+
+    $labelsUnavailable = ($_POST['label_ids_unavailable'] ?? '') === '1';
+    $postedLabelIds = $_POST['label_ids'] ?? [];
 
     $fields = [
         'date' => trim((string) ($_POST['date'] ?? '')),
@@ -22,6 +29,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'end_time' => trim((string) ($_POST['end_time'] ?? '')) ?: DEFAULT_APPOINTMENT_END_TIME,
         'name' => trim((string) ($_POST['name'] ?? '')) ?: DEFAULT_APPOINTMENT_NAME,
         'description' => (string) ($_POST['description'] ?? ''),
+        'label_ids' => $labelsUnavailable
+            ? $defaultLabelIds
+            : array_values(array_map('intval', is_array($postedLabelIds) ? $postedLabelIds : [])),
     ];
 
     $row = make_draft_row($fields, 'manual');
@@ -36,6 +46,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: dashboard.php');
     exit;
 }
+
+$labelsResult = groupalarm_get_labels_for_user($userId);
+$availableLabels = $labelsResult['labels'];
 
 $title = 'Termin hinzufügen';
 require __DIR__ . '/../templates/header.php';
@@ -61,6 +74,22 @@ require __DIR__ . '/../templates/header.php';
     <label for="description">Beschreibung</label>
     <textarea id="description" name="description" required><?= h($fields['description']) ?></textarea>
     <p class="field-hint">Mehrzeilig möglich (einfach Zeilenumbrüche verwenden).</p>
+
+    <label for="label_ids">Labels</label>
+    <?php if ($availableLabels): ?>
+        <select id="label_ids" name="label_ids[]" multiple size="8">
+            <?php foreach ($availableLabels as $label): ?>
+            <option value="<?= h((string) $label['id']) ?>" <?= in_array($label['id'], $fields['label_ids'], true) ? 'selected' : '' ?>>
+                <?= h($label['name']) ?> (#<?= h((string) $label['id']) ?>)
+            </option>
+            <?php endforeach; ?>
+        </select>
+        <p class="field-hint">Mehrfachauswahl möglich (Strg/Cmd gedrückt halten). Vorbelegt mit den Standard-Labels aus den Einstellungen.</p>
+    <?php else: ?>
+        <select id="label_ids" name="label_ids[]" multiple size="8" disabled></select>
+        <input type="hidden" name="label_ids_unavailable" value="1">
+        <p class="field-hint field-warning"><?= h($labelsResult['error'] ?? 'Labels konnten nicht von Groupalarm geladen werden.') ?></p>
+    <?php endif; ?>
 
     <button type="submit">Zur Entwurfsliste hinzufügen</button>
 </form>

@@ -78,23 +78,25 @@ function validate_draft_row(array $row): array
         $errors[] = 'Beschreibung fehlt.';
     }
 
+    if (empty($row['label_ids'] ?? [])) {
+        $errors[] = 'Mindestens ein Label muss ausgewählt sein.';
+    }
+
     return $errors;
 }
 
 /**
- * Validates that the given user has enough Groupalarm configuration (org ID + at
- * least one label) to actually send appointments. Checked once per batch send, not
- * per row, since these are user-level settings.
+ * Validates that the given user has enough Groupalarm configuration (org ID + API
+ * token) to actually send appointments. Checked once per batch send, not per row,
+ * since these are user-level settings. Labels are validated per row instead (see
+ * validate_draft_row()), since each appointment now carries its own label_ids.
  */
-function validate_user_groupalarm_config(?int $organizationId, array $labelIds, ?string $apiToken): array
+function validate_user_groupalarm_config(?int $organizationId, ?string $apiToken): array
 {
     $errors = [];
 
     if ($organizationId === null || $organizationId <= 0) {
         $errors[] = 'Keine Organisation-ID hinterlegt (siehe Einstellungen).';
-    }
-    if (empty($labelIds)) {
-        $errors[] = 'Keine Label-IDs hinterlegt (siehe Einstellungen).';
     }
     if ($apiToken === null || $apiToken === '') {
         $errors[] = 'Kein Groupalarm-API-Token hinterlegt (siehe Einstellungen).';

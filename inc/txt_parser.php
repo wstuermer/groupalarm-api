@@ -22,8 +22,12 @@ declare(strict_types=1);
  *
  * Returns a list of draft rows (see make_draft_row()); invalid lines are included with
  * their errors populated, not dropped, so the review screen can show and fix them.
+ *
+ * $defaultLabelIds are stamped onto every parsed row (the user's current Groupalarm
+ * label defaults from Einstellungen) so uploaded rows start with sensible labels,
+ * editable afterwards per row in the review view.
  */
-function parse_appointments_text(string $text): array
+function parse_appointments_text(string $text, array $defaultLabelIds = []): array
 {
     $rows = [];
     $lines = preg_split('/\r\n|\r|\n/', $text) ?: [];
@@ -38,7 +42,7 @@ function parse_appointments_text(string $text): array
 
         if (!mb_check_encoding($line, 'UTF-8')) {
             $rows[] = make_draft_row(
-                ['description' => $rawLine],
+                ['description' => $rawLine, 'label_ids' => $defaultLabelIds],
                 'upload',
                 ["Zeile {$lineNumber}: ungültige Zeichenkodierung (bitte UTF-8)."],
                 $lineNumber
@@ -48,7 +52,7 @@ function parse_appointments_text(string $text): array
 
         if (!preg_match('/^(\d{4}-\d{2}-\d{2})\s+(.*)$/', $line, $m)) {
             $rows[] = make_draft_row(
-                ['description' => $line],
+                ['description' => $line, 'label_ids' => $defaultLabelIds],
                 'upload',
                 ["Zeile {$lineNumber}: erwarte 'YYYY-MM-DD Beschreibung'."],
                 $lineNumber
@@ -87,6 +91,7 @@ function parse_appointments_text(string $text): array
                 'end_time' => $endTime,
                 'name' => DEFAULT_APPOINTMENT_NAME,
                 'description' => $description,
+                'label_ids' => $defaultLabelIds,
             ],
             'upload',
             $extraErrors,

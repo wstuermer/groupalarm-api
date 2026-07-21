@@ -19,6 +19,7 @@ function make_draft_row(array $fields, string $source, array $extraErrors = [], 
         'end_time' => $fields['end_time'] ?? DEFAULT_APPOINTMENT_END_TIME,
         'name' => $fields['name'] ?? DEFAULT_APPOINTMENT_NAME,
         'description' => $fields['description'] ?? '',
+        'label_ids' => array_values(array_map('intval', $fields['label_ids'] ?? [])),
         'source' => $source,
         'line_number' => $lineNumber,
     ];

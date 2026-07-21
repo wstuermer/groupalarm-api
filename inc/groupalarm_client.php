@@ -55,11 +55,12 @@ function groupalarm_to_utc_timestamp(string $date, string $time): string
 }
 
 /**
- * Builds the JSON-ready payload array for one appointment.
+ * Builds the JSON-ready payload array for one appointment. Labels are per-row
+ * (each draft row carries its own label_ids, editable in the review view) -
  * isPublic/keepLabelParticipantsInSync/reminder are fixed to sensible defaults -
  * not part of this app's scope, easy to expose as settings later if needed.
  */
-function groupalarm_build_payload(array $row, int $organizationId, array $labelIds): array
+function groupalarm_build_payload(array $row, int $organizationId): array
 {
     return [
         'description' => normalize_description((string) $row['description']),
@@ -67,7 +68,7 @@ function groupalarm_build_payload(array $row, int $organizationId, array $labelI
         'endDate' => groupalarm_to_utc_timestamp($row['date'], $row['end_time']),
         'isPublic' => false,
         'keepLabelParticipantsInSync' => true,
-        'labelIDs' => array_values(array_map('intval', $labelIds)),
+        'labelIDs' => array_values(array_map('intval', $row['label_ids'] ?? [])),
         'participants' => [],
         'name' => $row['name'] !== '' ? $row['name'] : DEFAULT_APPOINTMENT_NAME,
         'organizationID' => $organizationId,
@@ -123,12 +124,12 @@ function groupalarm_send_appointment(string $token, array $payload): array
  * carrying the payload and original row for logging. One row's failure never aborts
  * the remaining rows.
  */
-function groupalarm_send_batch(string $token, int $organizationId, array $labelIds, array $rows): array
+function groupalarm_send_batch(string $token, int $organizationId, array $rows): array
 {
     $results = [];
 
     foreach ($rows as $row) {
-        $payload = groupalarm_build_payload($row, $organizationId, $labelIds);
+        $payload = groupalarm_build_payload($row, $organizationId);
 
         try {
             $result = groupalarm_send_appointment($token, $payload);
