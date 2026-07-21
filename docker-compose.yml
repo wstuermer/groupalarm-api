@@ -1,0 +1,42 @@
+# Nur für lokale Tests (z.B. via OrbStack/Docker Desktop) - NICHT für Production.
+# Nutzt ausschliesslich eigene, lokale Config/Secrets/DB (siehe docker/local/),
+# fasst also nie die echte config.php / secrets/master.key im Repo-Wurzelverzeichnis an.
+
+services:
+  db:
+    image: mariadb:11
+    restart: unless-stopped
+    environment:
+      MARIADB_DATABASE: groupalarm_api
+      MARIADB_USER: groupalarm_api
+      MARIADB_PASSWORD: local-dev-password
+      MARIADB_ROOT_PASSWORD: local-dev-root-password
+    volumes:
+      - groupalarm_local_db:/var/lib/mysql
+      - ./db/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+
+  app:
+    build: .
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "8090:80"
+    volumes:
+      - ./public:/var/www/html/public
+      - ./inc:/var/www/html/inc
+      - ./templates:/var/www/html/templates
+      - ./db:/var/www/html/db
+      - ./docs:/var/www/html/docs
+      - ./docker/local/config.php:/var/www/html/config.php:ro
+      - ./docker/local/secrets:/var/www/html/secrets
+      - ./docker/local/logs:/var/www/html/logs
+
+volumes:
+  groupalarm_local_db:

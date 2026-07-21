@@ -1,0 +1,7 @@
+.git
+.claude
+config.php
+secrets/
+logs/
+docker/local/
+.DS_Store
