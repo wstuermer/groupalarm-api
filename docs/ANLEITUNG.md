@@ -19,11 +19,12 @@ Die Adresse der Anwendung lautet: `<ADRESSE VOM ADMIN EINTRAGEN>`
 
 ## 2. Einmalige Einrichtung (bevor du den ersten Termin anlegst)
 
-Bevor du Termine anlegen kannst, musst du einmalig unter **Einstellungen** drei Dinge
-hinterlegen: deine Groupalarm-**Organisation-ID**, deine Standard-**Labels** und
-deinen persönlichen **API-Token**. Organisation-ID und API-Token findest du in deinem
-Groupalarm-Account; die Labels wählst du direkt in der Anwendung aus einer Liste aus,
-die von Groupalarm geladen wird.
+Bevor du Termine anlegen kannst, musst du einmalig unter **Einstellungen** vier Dinge
+hinterlegen: deine Groupalarm-**Organisation-ID**, deine Standard-**Labels**, deine
+Standard-**Erinnerung** und deinen persönlichen **API-Token**. Organisation-ID und
+API-Token findest du in deinem Groupalarm-Account; die Labels wählst du direkt in der
+Anwendung aus einer Liste aus, die von Groupalarm geladen wird, und die Erinnerung aus
+einer vorgegebenen Auswahl.
 
 ### 2.1 API-Token generieren
 
@@ -58,6 +59,15 @@ Strg-/Cmd-Taste). Diese Auswahl ist nur der **Standard für neue Termine** - du 
 die Labels für jeden einzelnen Termin in der Entwurfsliste noch individuell ändern
 (siehe Abschnitt 3.3).
 
+### 2.4 Standard-Erinnerung festlegen
+
+Die Erinnerung legt fest, wie lange vor dem Termin Personen, die noch nicht reagiert
+haben, per Push-Benachrichtigung erinnert werden. Unter **Einstellungen →
+Standard-Erinnerung** wählst du aus einer vorgegebenen Liste (z.B. "Keine Erinnerung",
+"1 Stunde vorher" bis "7 Tage vorher"); Standard ist "2 Tage vorher". Auch das ist nur
+der **Standard für neue Termine** - änderbar sowohl beim manuellen Anlegen als auch
+später in der Entwurfsliste pro Termin (siehe Abschnitt 3.3).
+
 ---
 
 ## 3. Termine anlegen
@@ -69,8 +79,9 @@ und korrigieren kannst. Nichts wird sofort an Groupalarm gesendet.
 ### 3.1 Über das Formular ("Neuer Termin")
 
 Trage Datum, Start-/Endzeit (Standard 19:00-21:00 Uhr, änderbar), Betreff (Standard
-"Übungsdienst", änderbar) und Beschreibung ein und klicke auf "Zur Entwurfsliste
-hinzufügen".
+"Übungsdienst", änderbar), Beschreibung, Erinnerung (vorbelegt mit deiner
+Standard-Erinnerung) und Labels (vorbelegt mit deinen Standard-Labels) ein und klicke
+auf "Zur Entwurfsliste hinzufügen".
 
 ### 3.2 Über Datei-Upload ("Datei hochladen")
 
@@ -100,11 +111,11 @@ danach in der Entwurfsliste bei Bedarf pro Termin ändern kannst.
 ### 3.3 Entwurfsliste prüfen und senden
 
 Nach dem Hinzufügen (egal ob per Formular oder Upload) siehst du alle Termine in einer
-Liste, inklusive der Labels, mit denen sie gesendet würden. Zeilen mit Fehlern (z.B.
-ungültiges Datum oder kein ausgewähltes Label) sind rot markiert und mit einer
-Fehlermeldung versehen - klicke auf "Bearbeiten", um sie zu korrigieren (dort lassen
-sich auch die Labels für diesen einen Termin ändern), oder auf "Löschen", um sie zu
-entfernen.
+Liste, inklusive der Labels und der Erinnerung, mit denen sie gesendet würden. Zeilen
+mit Fehlern (z.B. ungültiges Datum oder kein ausgewähltes Label) sind rot markiert und
+mit einer Fehlermeldung versehen - klicke auf "Bearbeiten", um sie zu korrigieren (dort
+lassen sich auch Labels und Erinnerung für diesen einen Termin ändern), oder auf
+"Löschen", um sie zu entfernen.
 
 Erst wenn du auf **"Alle fehlerfreien Termine senden"** klickst, werden die Termine
 tatsächlich an Groupalarm übermittelt. Fehlerhafte Zeilen werden dabei übersprungen

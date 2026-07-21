@@ -20,6 +20,9 @@ function make_draft_row(array $fields, string $source, array $extraErrors = [], 
         'name' => $fields['name'] ?? DEFAULT_APPOINTMENT_NAME,
         'description' => $fields['description'] ?? '',
         'label_ids' => array_values(array_map('intval', $fields['label_ids'] ?? [])),
+        'reminder_minutes' => normalize_reminder_minutes(
+            array_key_exists('reminder_minutes', $fields) ? $fields['reminder_minutes'] : DEFAULT_APPOINTMENT_REMINDER_MINUTES
+        ),
         'source' => $source,
         'line_number' => $lineNumber,
     ];

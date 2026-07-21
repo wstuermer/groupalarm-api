@@ -7,6 +7,7 @@ require_login();
 
 $userId = (int) current_user()['id'];
 $defaultLabelIds = groupalarm_get_label_ids($userId);
+$defaultReminderMinutes = groupalarm_get_default_reminder_minutes($userId);
 
 $fields = [
     'date' => '',
@@ -15,6 +16,7 @@ $fields = [
     'name' => DEFAULT_APPOINTMENT_NAME,
     'description' => '',
     'label_ids' => $defaultLabelIds,
+    'reminder_minutes' => $defaultReminderMinutes,
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -32,6 +34,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         'label_ids' => $labelsUnavailable
             ? $defaultLabelIds
             : array_values(array_map('intval', is_array($postedLabelIds) ? $postedLabelIds : [])),
+        'reminder_minutes' => normalize_reminder_minutes($_POST['reminder_minutes'] ?? ''),
     ];
 
     $row = make_draft_row($fields, 'manual');
@@ -74,6 +77,16 @@ require __DIR__ . '/../templates/header.php';
     <label for="description">Beschreibung</label>
     <textarea id="description" name="description" required><?= h($fields['description']) ?></textarea>
     <p class="field-hint">Mehrzeilig möglich (einfach Zeilenumbrüche verwenden).</p>
+
+    <label for="reminder_minutes">Erinnerung</label>
+    <select id="reminder_minutes" name="reminder_minutes">
+        <?php foreach (REMINDER_OPTIONS as $value => $label): ?>
+        <option value="<?= h((string) $value) ?>" <?= $value === ($fields['reminder_minutes'] ?? '') ? 'selected' : '' ?>>
+            <?= h($label) ?>
+        </option>
+        <?php endforeach; ?>
+    </select>
+    <p class="field-hint">Vorbelegt mit der Standard-Erinnerung aus den Einstellungen.</p>
 
     <label for="label_ids">Labels</label>
     <?php if ($availableLabels): ?>

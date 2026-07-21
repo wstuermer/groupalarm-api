@@ -133,6 +133,7 @@ require __DIR__ . '/../templates/header.php';
                 <th>Betreff</th>
                 <th>Beschreibung</th>
                 <th>Labels</th>
+                <th>Erinnerung</th>
                 <th>Quelle</th>
                 <th>Aktionen</th>
             </tr>
@@ -149,6 +150,7 @@ require __DIR__ . '/../templates/header.php';
                     fn (int $id) => $labelNameMap[$id] ?? ('#' . $id),
                     $row['label_ids'] ?? []
                 ))) ?></td>
+                <td><?= h(reminder_option_label($row['reminder_minutes'] ?? null)) ?></td>
                 <td><?= $row['source'] === 'upload' ? 'Upload' . ($row['line_number'] ? " (Zeile {$row['line_number']})" : '') : 'Manuell' ?></td>
                 <td class="actions-row">
                     <a href="draft_edit.php?row_id=<?= urlencode($row['row_id']) ?>">Bearbeiten</a>
@@ -157,7 +159,7 @@ require __DIR__ . '/../templates/header.php';
             </tr>
             <?php if ($row['errors']): ?>
             <tr class="row-error">
-                <td colspan="8">
+                <td colspan="9">
                     <ul class="row-errors">
                         <?php foreach ($row['errors'] as $error): ?>
                         <li><?= h($error) ?></li>

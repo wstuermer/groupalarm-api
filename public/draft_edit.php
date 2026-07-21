@@ -41,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'label_ids' => $labelsUnavailable
                 ? ($existingRow['label_ids'] ?? [])
                 : array_values(array_map('intval', is_array($postedLabelIds) ? $postedLabelIds : [])),
+            'reminder_minutes' => normalize_reminder_minutes($_POST['reminder_minutes'] ?? ''),
         ];
         draft_update_row($rowId, $fields);
         flash_set('success', 'Zeile aktualisiert.');
@@ -95,6 +96,16 @@ require __DIR__ . '/../templates/header.php';
 
     <label for="description">Beschreibung</label>
     <textarea id="description" name="description" required><?= h($row['description']) ?></textarea>
+
+    <label for="reminder_minutes">Erinnerung</label>
+    <select id="reminder_minutes" name="reminder_minutes">
+        <?php foreach (REMINDER_OPTIONS as $value => $label): ?>
+        <option value="<?= h((string) $value) ?>" <?= $value === ($row['reminder_minutes'] ?? '') ? 'selected' : '' ?>>
+            <?= h($label) ?>
+        </option>
+        <?php endforeach; ?>
+    </select>
+    <p class="field-hint">Überschreibt die Standard-Erinnerung für diesen Termin.</p>
 
     <label for="label_ids">Labels</label>
     <?php if ($availableLabels): ?>

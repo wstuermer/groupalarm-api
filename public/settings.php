@@ -36,6 +36,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $organizationId = (string) ($_POST['organization_id'] ?? '');
         $labelsUnavailable = ($_POST['label_ids_unavailable'] ?? '') === '1';
         $labelIdsRaw = $_POST['label_ids'] ?? [];
+        $reminderMinutes = normalize_reminder_minutes($_POST['reminder_minutes'] ?? '');
 
         $labelIds = array_values(array_filter(array_map(
             fn ($v) => (int) $v,
@@ -48,9 +49,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo = db();
             $pdo->beginTransaction();
             $pdo->prepare(
-                'INSERT INTO groupalarm_settings (user_id, organization_id) VALUES (?, ?)
-                 ON DUPLICATE KEY UPDATE organization_id = VALUES(organization_id)'
-            )->execute([$userId, (int) $organizationId]);
+                'INSERT INTO groupalarm_settings (user_id, organization_id, default_reminder_minutes) VALUES (?, ?, ?)
+                 ON DUPLICATE KEY UPDATE
+                    organization_id = VALUES(organization_id),
+                    default_reminder_minutes = VALUES(default_reminder_minutes)'
+            )->execute([$userId, (int) $organizationId, $reminderMinutes]);
 
             // If the label picker couldn't be loaded from Groupalarm, its selection is
             // meaningless (empty/disabled) - leave the previously saved labels untouched
@@ -67,8 +70,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->commit();
 
             flash_set('success', $labelsUnavailable
-                ? 'Organisation-ID gespeichert. Labels konnten nicht von Groupalarm geladen werden und wurden daher nicht verändert.'
-                : 'Organisation/Labels gespeichert.');
+                ? 'Organisation-ID und Erinnerung gespeichert. Labels konnten nicht von Groupalarm geladen werden und wurden daher nicht verändert.'
+                : 'Organisation, Labels und Erinnerung gespeichert.');
         }
     } elseif ($action === 'update_token') {
         $token = trim((string) ($_POST['api_token'] ?? ''));
@@ -99,6 +102,7 @@ $organizationId = $settingsRow['organization_id'] ?? '';
 $labelIds = groupalarm_get_label_ids($userId);
 $labelsResult = groupalarm_get_labels_for_user($userId);
 $availableLabels = $labelsResult['labels'];
+$reminderMinutes = groupalarm_get_default_reminder_minutes($userId);
 $hasToken = $settingsRow !== null && $settingsRow['api_token_ciphertext'] !== null;
 $tokenUpdatedAt = $hasToken ? $settingsRow['updated_at'] : null;
 
@@ -124,13 +128,23 @@ require __DIR__ . '/../templates/header.php';
     <button type="submit">Passwort ändern</button>
 </form>
 
-<h2>Groupalarm Organisation &amp; Labels</h2>
+<h2>Groupalarm Organisation, Labels &amp; Erinnerung</h2>
 <form class="card" method="post" action="settings.php">
     <?php csrf_field(); ?>
     <input type="hidden" name="action" value="update_groupalarm">
 
     <label for="organization_id">Organisation-ID</label>
     <input type="number" id="organization_id" name="organization_id" value="<?= h((string) $organizationId) ?>" min="1" required>
+
+    <label for="reminder_minutes">Standard-Erinnerung</label>
+    <select id="reminder_minutes" name="reminder_minutes">
+        <?php foreach (REMINDER_OPTIONS as $value => $label): ?>
+        <option value="<?= h((string) $value) ?>" <?= $value === ($reminderMinutes ?? '') ? 'selected' : '' ?>>
+            <?= h($label) ?>
+        </option>
+        <?php endforeach; ?>
+    </select>
+    <p class="field-hint">Wird jedem neuen Termin standardmäßig zugeordnet, ist aber pro Termin änderbar.</p>
 
     <label for="label_ids">Labels</label>
     <?php if ($availableLabels): ?>

@@ -24,6 +24,22 @@ function groupalarm_get_label_ids(int $userId): array
 }
 
 /**
+ * The user's default reminder (minutes before an appointment, or null for "keine
+ * Erinnerung") for newly created appointments - only falls back to the compiled-in
+ * DEFAULT_APPOINTMENT_REMINDER_MINUTES when the user has never saved any settings
+ * at all; once a groupalarm_settings row exists, an explicitly saved null (the user
+ * chose "keine Erinnerung" as their default) is honored as-is, not overridden.
+ */
+function groupalarm_get_default_reminder_minutes(int $userId): ?int
+{
+    $row = groupalarm_get_settings_row($userId);
+    if ($row === null) {
+        return DEFAULT_APPOINTMENT_REMINDER_MINUTES;
+    }
+    return $row['default_reminder_minutes'] !== null ? (int) $row['default_reminder_minutes'] : null;
+}
+
+/**
  * Decrypts and returns the user's Groupalarm Personal-Access-Token, or null if none
  * is stored / decryption fails. Only call this right before an actual API send.
  */
@@ -55,14 +71,18 @@ function groupalarm_to_utc_timestamp(string $date, string $time): string
 }
 
 /**
- * Builds the JSON-ready payload array for one appointment. Labels are per-row
- * (each draft row carries its own label_ids, editable in the review view) -
- * isPublic/keepLabelParticipantsInSync/reminder are fixed to sensible defaults -
- * not part of this app's scope, easy to expose as settings later if needed.
+ * Builds the JSON-ready payload array for one appointment. Labels and the reminder
+ * are per-row (each draft row carries its own label_ids/reminder_minutes, editable
+ * in the review view) - isPublic/keepLabelParticipantsInSync are fixed to sensible
+ * defaults, not part of this app's scope.
+ *
+ * A null reminder_minutes ("keine Erinnerung") omits the "reminder" key entirely
+ * rather than sending 0, since Groupalarm's API treats reminder as nullable - 0
+ * would mean "remind immediately", not "don't remind at all".
  */
 function groupalarm_build_payload(array $row, int $organizationId): array
 {
-    return [
+    $payload = [
         'description' => normalize_description((string) $row['description']),
         'startDate' => groupalarm_to_utc_timestamp($row['date'], $row['start_time']),
         'endDate' => groupalarm_to_utc_timestamp($row['date'], $row['end_time']),
@@ -73,8 +93,13 @@ function groupalarm_build_payload(array $row, int $organizationId): array
         'name' => $row['name'] !== '' ? $row['name'] : DEFAULT_APPOINTMENT_NAME,
         'organizationID' => $organizationId,
         'timezone' => 'Europe/Berlin',
-        'reminder' => DEFAULT_APPOINTMENT_REMINDER_MINUTES,
     ];
+
+    if (($row['reminder_minutes'] ?? null) !== null) {
+        $payload['reminder'] = (int) $row['reminder_minutes'];
+    }
+
+    return $payload;
 }
 
 /**
