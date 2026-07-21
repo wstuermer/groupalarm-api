@@ -25,6 +25,7 @@ require_once __DIR__ . '/validation.php';
 require_once __DIR__ . '/draft_store.php';
 require_once __DIR__ . '/txt_parser.php';
 require_once __DIR__ . '/groupalarm_client.php';
+require_once __DIR__ . '/groupalarm_labels.php';
 
 // --- Hardened session, started before any output ---
 ini_set('session.use_strict_mode', '1');

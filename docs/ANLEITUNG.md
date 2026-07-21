@@ -19,10 +19,12 @@ Die Adresse der Anwendung lautet: `<ADRESSE VOM ADMIN EINTRAGEN>`
 
 ## 2. Einmalige Einrichtung (bevor du den ersten Termin anlegst)
 
-Bevor du Termine anlegen kannst, musst du einmalig unter **Einstellungen** drei Dinge
-hinterlegen: deine Groupalarm-**Organisation-ID**, die passenden **Label-IDs** und
-deinen persönlichen **API-Token**. Alle drei findest du in deinem Groupalarm-Account,
-nicht in dieser Anwendung.
+Bevor du Termine anlegen kannst, musst du einmalig unter **Einstellungen** vier Dinge
+hinterlegen: deine Groupalarm-**Organisation-ID**, deine Standard-**Labels**, deine
+Standard-**Erinnerung** und deinen persönlichen **API-Token**. Organisation-ID und
+API-Token findest du in deinem Groupalarm-Account; die Labels wählst du direkt in der
+Anwendung aus einer Liste aus, die von Groupalarm geladen wird, und die Erinnerung aus
+einer vorgegebenen Auswahl.
 
 ### 2.1 API-Token generieren
 
@@ -43,15 +45,28 @@ Anwendung zeigt ihn danach nie wieder im Klartext an (nur "konfiguriert" bzw.
 
 Die Organisation-ID trägst du unter **Einstellungen → Organisation-ID** ein.
 
-### 2.3 Label-IDs finden
+### 2.3 Standard-Labels auswählen
 
 Labels bestimmen, wer in Groupalarm zu einem Termin eingeladen wird (z.B. "Aktive
-Wehr", "Jugendfeuerwehr"). Du kannst mehrere Label-IDs angeben.
+Wehr", "Jugendfeuerwehr"). Es muss immer mindestens ein Label ausgewählt sein, mehrere
+sind möglich.
 
-![Screenshot: Wo man in Groupalarm die Label-IDs findet](screenshots/groupalarm-label-ids.png)
+**Wichtig:** Die Auswahlliste unter **Einstellungen → Labels** wird erst befüllt,
+nachdem Organisation-ID und API-Token gespeichert wurden (Labels werden live aus deiner
+Groupalarm-Organisation geladen) - trage diese beiden also zuerst ein, speichere, und
+wähle danach deine Standard-Labels aus (Mehrfachauswahl mit gedrückter
+Strg-/Cmd-Taste). Diese Auswahl ist nur der **Standard für neue Termine** - du kannst
+die Labels für jeden einzelnen Termin in der Entwurfsliste noch individuell ändern
+(siehe Abschnitt 3.3).
 
-Trage die Label-IDs unter **Einstellungen → Label-IDs** ein, durch Komma getrennt,
-z.B. `21868, 21840, 21832`.
+### 2.4 Standard-Erinnerung festlegen
+
+Die Erinnerung legt fest, wie lange vor dem Termin Personen, die noch nicht reagiert
+haben, per Push-Benachrichtigung erinnert werden. Unter **Einstellungen →
+Standard-Erinnerung** wählst du aus einer vorgegebenen Liste (z.B. "Keine Erinnerung",
+"1 Stunde vorher" bis "7 Tage vorher"); Standard ist "2 Tage vorher". Auch das ist nur
+der **Standard für neue Termine** - änderbar sowohl beim manuellen Anlegen als auch
+später in der Entwurfsliste pro Termin (siehe Abschnitt 3.3).
 
 ---
 
@@ -64,8 +79,9 @@ und korrigieren kannst. Nichts wird sofort an Groupalarm gesendet.
 ### 3.1 Über das Formular ("Neuer Termin")
 
 Trage Datum, Start-/Endzeit (Standard 19:00-21:00 Uhr, änderbar), Betreff (Standard
-"Übungsdienst", änderbar) und Beschreibung ein und klicke auf "Zur Entwurfsliste
-hinzufügen".
+"Übungsdienst", änderbar), Beschreibung, Erinnerung (vorbelegt mit deiner
+Standard-Erinnerung) und Labels (vorbelegt mit deinen Standard-Labels) ein und klicke
+auf "Zur Entwurfsliste hinzufügen".
 
 ### 3.2 Über Datei-Upload ("Datei hochladen")
 
@@ -95,8 +111,10 @@ danach in der Entwurfsliste bei Bedarf pro Termin ändern kannst.
 ### 3.3 Entwurfsliste prüfen und senden
 
 Nach dem Hinzufügen (egal ob per Formular oder Upload) siehst du alle Termine in einer
-Liste. Zeilen mit Fehlern (z.B. ungültiges Datum) sind rot markiert und mit einer
-Fehlermeldung versehen - klicke auf "Bearbeiten", um sie zu korrigieren, oder auf
+Liste, inklusive der Labels und der Erinnerung, mit denen sie gesendet würden. Zeilen
+mit Fehlern (z.B. ungültiges Datum oder kein ausgewähltes Label) sind rot markiert und
+mit einer Fehlermeldung versehen - klicke auf "Bearbeiten", um sie zu korrigieren (dort
+lassen sich auch Labels und Erinnerung für diesen einen Termin ändern), oder auf
 "Löschen", um sie zu entfernen.
 
 Erst wenn du auf **"Alle fehlerfreien Termine senden"** klickst, werden die Termine
@@ -116,8 +134,8 @@ setzen kannst.
 ## 5. Häufige Fragen
 
 **Ich sehe eine Fehlermeldung "Keine Organisation-ID hinterlegt" o.ä. beim Senden.**
-→ Siehe Abschnitt 2 - Organisation-ID, Label-IDs und API-Token müssen einmalig unter
-"Einstellungen" hinterlegt sein, bevor du Termine senden kannst.
+→ Siehe Abschnitt 2 - Organisation-ID, Standard-Labels und API-Token müssen einmalig
+unter "Einstellungen" hinterlegt sein, bevor du Termine senden kannst.
 
 **Ich möchte meinen API-Token ändern.**
 → Unter "Einstellungen" einfach einen neuen Token eingeben und speichern - der alte

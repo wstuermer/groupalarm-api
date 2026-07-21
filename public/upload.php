@@ -5,6 +5,7 @@ declare(strict_types=1);
 require __DIR__ . '/../inc/bootstrap.php';
 require_login();
 
+$userId = (int) current_user()['id'];
 $error = null;
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -23,7 +24,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($contents === false) {
             $error = 'Datei konnte nicht gelesen werden.';
         } else {
-            $rows = parse_appointments_text($contents);
+            $rows = parse_appointments_text(
+                $contents,
+                groupalarm_get_label_ids($userId),
+                groupalarm_get_default_reminder_minutes($userId)
+            );
             if (!$rows) {
                 $error = 'Datei enthält keine verwertbaren Zeilen (nur Kommentare/Leerzeilen?).';
             } else {

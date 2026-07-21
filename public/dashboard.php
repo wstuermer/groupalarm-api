@@ -13,12 +13,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'send_
 
     $settingsRow = groupalarm_get_settings_row($userId);
     $organizationId = $settingsRow['organization_id'] ?? null;
-    $labelIds = groupalarm_get_label_ids($userId);
     $token = groupalarm_get_decrypted_token($userId);
 
     $configErrors = validate_user_groupalarm_config(
         $organizationId !== null ? (int) $organizationId : null,
-        $labelIds,
         $token
     );
 
@@ -45,7 +43,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'send_
         exit;
     }
 
-    $results = groupalarm_send_batch((string) $token, (int) $organizationId, $labelIds, $readyRows);
+    $results = groupalarm_send_batch((string) $token, (int) $organizationId, $readyRows);
 
     $successRowIds = [];
     $insertLog = db()->prepare(
@@ -70,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'send_
             $startLocal,
             $endLocal,
             $organizationId,
-            json_encode($labelIds),
+            json_encode($row['label_ids']),
             $result['success'] ? 'success' : 'error',
             $result['http_status'],
             $result['error'],
@@ -104,6 +102,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && ($_POST['action'] ?? '') === 'send_
 }
 
 $draft = draft_get_all();
+$labelsResult = groupalarm_get_labels_for_user($userId);
+$labelNameMap = groupalarm_label_name_map($labelsResult['labels']);
 
 $title = 'Entwürfe';
 require __DIR__ . '/../templates/header.php';
@@ -113,6 +113,10 @@ require __DIR__ . '/../templates/header.php';
     <a href="add_appointment.php" class="btn">+ Termin hinzufügen</a>
     <a href="upload.php" class="btn btn-secondary">Datei hochladen</a>
 </p>
+
+<?php if (!$labelsResult['success'] && empty($labelNameMap)): ?>
+<p class="field-hint field-warning">Label-Namen konnten nicht von Groupalarm geladen werden - IDs werden angezeigt.</p>
+<?php endif; ?>
 
 <?php if (!$draft): ?>
 <p>Keine Entwürfe vorhanden. Füge einen Termin hinzu oder lade eine appointments.txt hoch.</p>
@@ -128,6 +132,8 @@ require __DIR__ . '/../templates/header.php';
                 <th>Ende</th>
                 <th>Betreff</th>
                 <th>Beschreibung</th>
+                <th>Labels</th>
+                <th>Erinnerung</th>
                 <th>Quelle</th>
                 <th>Aktionen</th>
             </tr>
@@ -140,6 +146,11 @@ require __DIR__ . '/../templates/header.php';
                 <td><?= h($row['end_time']) ?></td>
                 <td><?= h($row['name']) ?></td>
                 <td><?= nl2br(h($row['description'])) ?></td>
+                <td><?= h(implode(', ', array_map(
+                    fn (int $id) => $labelNameMap[$id] ?? ('#' . $id),
+                    $row['label_ids'] ?? []
+                ))) ?></td>
+                <td><?= h(reminder_option_label($row['reminder_minutes'] ?? null)) ?></td>
                 <td><?= $row['source'] === 'upload' ? 'Upload' . ($row['line_number'] ? " (Zeile {$row['line_number']})" : '') : 'Manuell' ?></td>
                 <td class="actions-row">
                     <a href="draft_edit.php?row_id=<?= urlencode($row['row_id']) ?>">Bearbeiten</a>
@@ -148,7 +159,7 @@ require __DIR__ . '/../templates/header.php';
             </tr>
             <?php if ($row['errors']): ?>
             <tr class="row-error">
-                <td colspan="7">
+                <td colspan="9">
                     <ul class="row-errors">
                         <?php foreach ($row['errors'] as $error): ?>
                         <li><?= h($error) ?></li>

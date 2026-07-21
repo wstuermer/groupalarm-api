@@ -1,6 +1,10 @@
 -- Groupalarm Appointment Manager - schema
 -- Import once against an empty database, e.g.:
 --   mysql -u root -p groupalarm_api < db/schema.sql
+--
+-- Already have a populated database from before? Apply the scripts under
+-- db/migrations/ instead (in filename order) - this file always reflects the
+-- current full schema for fresh installs only, it is not itself a migration.
 
 CREATE TABLE users (
     id              INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -29,12 +33,16 @@ CREATE TABLE password_resets (
 -- 1:1 with users, kept separate so the ciphertext columns are never accidentally
 -- pulled into a generic user-listing query (e.g. admin_users.php).
 CREATE TABLE groupalarm_settings (
-    user_id               INT UNSIGNED PRIMARY KEY,
-    organization_id       BIGINT UNSIGNED NULL,
-    api_token_ciphertext  VARBINARY(1024) NULL,
-    api_token_nonce       VARBINARY(16) NULL,
-    api_token_tag         VARBINARY(16) NULL,
-    updated_at            DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    user_id                   INT UNSIGNED PRIMARY KEY,
+    organization_id           BIGINT UNSIGNED NULL,
+    api_token_ciphertext      VARBINARY(1024) NULL,
+    api_token_nonce           VARBINARY(16) NULL,
+    api_token_tag             VARBINARY(16) NULL,
+    -- Default "reminder" (minutes before an appointment) for newly created appointments,
+    -- NULL means "keine Erinnerung". See inc/validation.php's REMINDER_OPTIONS for the
+    -- allowed preset values.
+    default_reminder_minutes SMALLINT UNSIGNED NULL DEFAULT 2880,
+    updated_at                DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_gasettings_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 

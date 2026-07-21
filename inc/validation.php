@@ -25,6 +25,54 @@ function is_valid_time(string $time): bool
 }
 
 /**
+ * Plausible preset values for an appointment's "reminder" (minutes before the
+ * appointment after which participants who haven't responded get a push reminder).
+ * Bounded by Groupalarm's API limits (0-10080 minutes / 7 days, see
+ * https://developer.groupalarm.com/api/appointment.html#tag/appointment/operation/CreateAppointment).
+ * '' (empty string, normalizes to null) means "no reminder" - the reminder key is
+ * then omitted from the payload entirely rather than sending e.g. 0.
+ */
+const REMINDER_OPTIONS = [
+    '' => 'Keine Erinnerung',
+    60 => '1 Stunde vorher',
+    180 => '3 Stunden vorher',
+    360 => '6 Stunden vorher',
+    720 => '12 Stunden vorher',
+    1440 => '1 Tag vorher',
+    2880 => '2 Tage vorher (Standard)',
+    4320 => '3 Tage vorher',
+    7200 => '5 Tage vorher',
+    10080 => '7 Tage vorher (Maximum)',
+];
+
+/**
+ * Normalizes a raw reminder value (from $_POST, a stored default, or an explicit
+ * null) against REMINDER_OPTIONS. Anything not exactly matching one of the preset
+ * values (e.g. a tampered request) silently falls back to null ("keine Erinnerung")
+ * rather than surfacing a row error - there's always a safe, valid value to fall
+ * back to, unlike labels which have no safe default.
+ */
+function normalize_reminder_minutes(mixed $raw): ?int
+{
+    if ($raw === null || $raw === '') {
+        return null;
+    }
+    $minutes = (int) $raw;
+    return array_key_exists($minutes, REMINDER_OPTIONS) ? $minutes : null;
+}
+
+/**
+ * Human-readable label for a normalized reminder value, e.g. for the dashboard's
+ * reminder column. Falls back to a raw-minutes display for a value that somehow
+ * isn't one of the presets (should not normally happen, normalize_reminder_minutes()
+ * already guards against that on every write path).
+ */
+function reminder_option_label(?int $minutes): string
+{
+    return REMINDER_OPTIONS[$minutes ?? ''] ?? "{$minutes} Minuten vorher";
+}
+
+/**
  * Normalizes a description as entered by the user: expands the literal two-character
  * "\n" escape sequence (the appointments.txt convention) into a real newline, and
  * collapses CRLF/lone-CR line endings down to plain LF. Browsers submit <textarea>
@@ -78,23 +126,25 @@ function validate_draft_row(array $row): array
         $errors[] = 'Beschreibung fehlt.';
     }
 
+    if (empty($row['label_ids'] ?? [])) {
+        $errors[] = 'Mindestens ein Label muss ausgewählt sein.';
+    }
+
     return $errors;
 }
 
 /**
- * Validates that the given user has enough Groupalarm configuration (org ID + at
- * least one label) to actually send appointments. Checked once per batch send, not
- * per row, since these are user-level settings.
+ * Validates that the given user has enough Groupalarm configuration (org ID + API
+ * token) to actually send appointments. Checked once per batch send, not per row,
+ * since these are user-level settings. Labels are validated per row instead (see
+ * validate_draft_row()), since each appointment now carries its own label_ids.
  */
-function validate_user_groupalarm_config(?int $organizationId, array $labelIds, ?string $apiToken): array
+function validate_user_groupalarm_config(?int $organizationId, ?string $apiToken): array
 {
     $errors = [];
 
     if ($organizationId === null || $organizationId <= 0) {
         $errors[] = 'Keine Organisation-ID hinterlegt (siehe Einstellungen).';
-    }
-    if (empty($labelIds)) {
-        $errors[] = 'Keine Label-IDs hinterlegt (siehe Einstellungen).';
     }
     if ($apiToken === null || $apiToken === '') {
         $errors[] = 'Kein Groupalarm-API-Token hinterlegt (siehe Einstellungen).';
