@@ -42,6 +42,14 @@ CREATE TABLE groupalarm_settings (
     -- NULL means "keine Erinnerung". See inc/validation.php's REMINDER_OPTIONS for the
     -- allowed preset values.
     default_reminder_minutes SMALLINT UNSIGNED NULL DEFAULT 2880,
+    -- Default offset (minutes before an appointment) at which Groupalarm should send
+    -- out the appointment's invitations (the API's "notificationDate"), instead of
+    -- immediately at creation. NULL (the default) means "nicht gesetzt" - invitations
+    -- go out immediately, unchanged from before this column existed. Distinct concept
+    -- from default_reminder_minutes above: that's a push reminder to non-responders,
+    -- this is when the invitation itself first goes out. See inc/validation.php's
+    -- NOTIFICATION_OFFSET_OPTIONS for the allowed preset values.
+    default_notification_offset_minutes SMALLINT UNSIGNED NULL DEFAULT NULL,
     updated_at                DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_gasettings_user FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

@@ -73,6 +73,60 @@ function reminder_option_label(?int $minutes): string
 }
 
 /**
+ * Plausible preset values for an appointment's "Versandzeitpunkt" - the offset
+ * (minutes before the appointment start) at which Groupalarm should first send out
+ * the invitations, i.e. the API's "notificationDate"
+ * (https://developer.groupalarm.com/api/appointment.html#tag/appointment/operation/CreateAppointment).
+ * Distinct from REMINDER_OPTIONS above: a reminder is a follow-up push to people who
+ * haven't responded yet, this is when the invitation itself first goes out.
+ * '' (empty string, normalizes to null) means "nicht gesetzt" - notificationDate is
+ * then omitted from the payload entirely, so Groupalarm sends invitations immediately
+ * at creation (the behaviour before this setting existed). The largest preset is
+ * capped at one month (approximated as 30 days) before the appointment.
+ */
+const NOTIFICATION_OFFSET_OPTIONS = [
+    '' => 'Sofort bei Erstellung (Standard)',
+    60 => '1 Stunde vorher',
+    180 => '3 Stunden vorher',
+    360 => '6 Stunden vorher',
+    720 => '12 Stunden vorher',
+    1440 => '1 Tag vorher',
+    2880 => '2 Tage vorher',
+    4320 => '3 Tage vorher',
+    10080 => '1 Woche vorher',
+    20160 => '2 Wochen vorher',
+    43200 => '1 Monat vorher (Maximum)',
+];
+
+/**
+ * Normalizes a raw notification-offset value (from $_POST, a stored default, or an
+ * explicit null) against NOTIFICATION_OFFSET_OPTIONS. Anything not exactly matching
+ * one of the preset values (e.g. a tampered request) silently falls back to null
+ * ("nicht gesetzt"/sofort) rather than surfacing a row error - there's always a safe,
+ * valid value to fall back to.
+ */
+function normalize_notification_offset_minutes(mixed $raw): ?int
+{
+    if ($raw === null || $raw === '') {
+        return null;
+    }
+    $minutes = (int) $raw;
+    return array_key_exists($minutes, NOTIFICATION_OFFSET_OPTIONS) ? $minutes : null;
+}
+
+/**
+ * Human-readable label for a normalized notification-offset value, e.g. for the
+ * dashboard's Versandzeitpunkt column. Falls back to a raw-minutes display for a
+ * value that somehow isn't one of the presets (should not normally happen,
+ * normalize_notification_offset_minutes() already guards against that on every
+ * write path).
+ */
+function notification_offset_label(?int $minutes): string
+{
+    return NOTIFICATION_OFFSET_OPTIONS[$minutes ?? ''] ?? "{$minutes} Minuten vorher";
+}
+
+/**
  * Normalizes a description as entered by the user: expands the literal two-character
  * "\n" escape sequence (the appointments.txt convention) into a real newline, and
  * collapses CRLF/lone-CR line endings down to plain LF. Browsers submit <textarea>

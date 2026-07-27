@@ -134,6 +134,7 @@ require __DIR__ . '/../templates/header.php';
                 <th>Beschreibung</th>
                 <th>Labels</th>
                 <th>Erinnerung</th>
+                <th>Versandzeitpunkt</th>
                 <th>Quelle</th>
                 <th>Aktionen</th>
             </tr>
@@ -151,6 +152,7 @@ require __DIR__ . '/../templates/header.php';
                     $row['label_ids'] ?? []
                 ))) ?></td>
                 <td><?= h(reminder_option_label($row['reminder_minutes'] ?? null)) ?></td>
+                <td><?= h(notification_offset_label($row['notification_offset_minutes'] ?? null)) ?></td>
                 <td><?= $row['source'] === 'upload' ? 'Upload' . ($row['line_number'] ? " (Zeile {$row['line_number']})" : '') : 'Manuell' ?></td>
                 <td class="actions-row">
                     <a href="draft_edit.php?row_id=<?= urlencode($row['row_id']) ?>">Bearbeiten</a>
@@ -159,7 +161,7 @@ require __DIR__ . '/../templates/header.php';
             </tr>
             <?php if ($row['errors']): ?>
             <tr class="row-error">
-                <td colspan="9">
+                <td colspan="10">
                     <ul class="row-errors">
                         <?php foreach ($row['errors'] as $error): ?>
                         <li><?= h($error) ?></li>

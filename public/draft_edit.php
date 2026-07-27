@@ -42,6 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 ? ($existingRow['label_ids'] ?? [])
                 : array_values(array_map('intval', is_array($postedLabelIds) ? $postedLabelIds : [])),
             'reminder_minutes' => normalize_reminder_minutes($_POST['reminder_minutes'] ?? ''),
+            'notification_offset_minutes' => normalize_notification_offset_minutes($_POST['notification_offset_minutes'] ?? ''),
         ];
         draft_update_row($rowId, $fields);
         flash_set('success', 'Zeile aktualisiert.');
@@ -106,6 +107,16 @@ require __DIR__ . '/../templates/header.php';
         <?php endforeach; ?>
     </select>
     <p class="field-hint">Überschreibt die Standard-Erinnerung für diesen Termin.</p>
+
+    <label for="notification_offset_minutes">Versandzeitpunkt</label>
+    <select id="notification_offset_minutes" name="notification_offset_minutes">
+        <?php foreach (NOTIFICATION_OFFSET_OPTIONS as $value => $label): ?>
+        <option value="<?= h((string) $value) ?>" <?= $value === ($row['notification_offset_minutes'] ?? '') ? 'selected' : '' ?>>
+            <?= h($label) ?>
+        </option>
+        <?php endforeach; ?>
+    </select>
+    <p class="field-hint">Überschreibt den Standard-Versandzeitpunkt für diesen Termin.</p>
 
     <label for="label_ids">Labels</label>
     <?php if ($availableLabels): ?>

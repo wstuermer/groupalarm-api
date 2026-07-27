@@ -27,7 +27,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $rows = parse_appointments_text(
                 $contents,
                 groupalarm_get_label_ids($userId),
-                groupalarm_get_default_reminder_minutes($userId)
+                groupalarm_get_default_reminder_minutes($userId),
+                groupalarm_get_default_notification_offset_minutes($userId)
             );
             if (!$rows) {
                 $error = 'Datei enthält keine verwertbaren Zeilen (nur Kommentare/Leerzeilen?).';

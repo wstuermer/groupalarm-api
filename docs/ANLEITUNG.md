@@ -19,12 +19,12 @@ Die Adresse der Anwendung lautet: `<ADRESSE VOM ADMIN EINTRAGEN>`
 
 ## 2. Einmalige Einrichtung (bevor du den ersten Termin anlegst)
 
-Bevor du Termine anlegen kannst, musst du einmalig unter **Einstellungen** vier Dinge
+Bevor du Termine anlegen kannst, musst du einmalig unter **Einstellungen** fünf Dinge
 hinterlegen: deine Groupalarm-**Organisation-ID**, deine Standard-**Labels**, deine
-Standard-**Erinnerung** und deinen persönlichen **API-Token**. Organisation-ID und
-API-Token findest du in deinem Groupalarm-Account; die Labels wählst du direkt in der
-Anwendung aus einer Liste aus, die von Groupalarm geladen wird, und die Erinnerung aus
-einer vorgegebenen Auswahl.
+Standard-**Erinnerung**, deinen Standard-**Versandzeitpunkt** und deinen persönlichen
+**API-Token**. Organisation-ID und API-Token findest du in deinem Groupalarm-Account;
+die Labels wählst du direkt in der Anwendung aus einer Liste aus, die von Groupalarm
+geladen wird, Erinnerung und Versandzeitpunkt aus je einer vorgegebenen Auswahl.
 
 ### 2.1 API-Token generieren
 
@@ -68,6 +68,18 @@ Standard-Erinnerung** wählst du aus einer vorgegebenen Liste (z.B. "Keine Erinn
 der **Standard für neue Termine** - änderbar sowohl beim manuellen Anlegen als auch
 später in der Entwurfsliste pro Termin (siehe Abschnitt 3.3).
 
+### 2.5 Standard-Versandzeitpunkt festlegen
+
+Der Versandzeitpunkt legt fest, wann die **Termin-Einladung selbst** verschickt wird -
+das ist etwas anderes als die Erinnerung oben (die betrifft nur Leute, die die bereits
+verschickte Einladung noch nicht beantwortet haben). Unter **Einstellungen →
+Standard-Versandzeitpunkt** wählst du aus einer vorgegebenen Liste (z.B. "Sofort bei
+Erstellung", "1 Stunde vorher" bis "1 Monat vorher"); Standard ist "Sofort bei
+Erstellung" - Einladungen gehen also wie bisher direkt beim Anlegen des Termins raus,
+außer du wählst hier bewusst einen späteren Zeitpunkt. Auch das ist nur der **Standard
+für neue Termine** - änderbar sowohl beim manuellen Anlegen als auch später in der
+Entwurfsliste pro Termin (siehe Abschnitt 3.3).
+
 ---
 
 ## 3. Termine anlegen
@@ -80,8 +92,9 @@ und korrigieren kannst. Nichts wird sofort an Groupalarm gesendet.
 
 Trage Datum, Start-/Endzeit (Standard 19:00-21:00 Uhr, änderbar), Betreff (Standard
 "Übungsdienst", änderbar), Beschreibung, Erinnerung (vorbelegt mit deiner
-Standard-Erinnerung) und Labels (vorbelegt mit deinen Standard-Labels) ein und klicke
-auf "Zur Entwurfsliste hinzufügen".
+Standard-Erinnerung), Versandzeitpunkt (vorbelegt mit deinem Standard-Versandzeitpunkt)
+und Labels (vorbelegt mit deinen Standard-Labels) ein und klicke auf "Zur
+Entwurfsliste hinzufügen".
 
 ### 3.2 Über Datei-Upload ("Datei hochladen")
 
@@ -111,11 +124,11 @@ danach in der Entwurfsliste bei Bedarf pro Termin ändern kannst.
 ### 3.3 Entwurfsliste prüfen und senden
 
 Nach dem Hinzufügen (egal ob per Formular oder Upload) siehst du alle Termine in einer
-Liste, inklusive der Labels und der Erinnerung, mit denen sie gesendet würden. Zeilen
-mit Fehlern (z.B. ungültiges Datum oder kein ausgewähltes Label) sind rot markiert und
-mit einer Fehlermeldung versehen - klicke auf "Bearbeiten", um sie zu korrigieren (dort
-lassen sich auch Labels und Erinnerung für diesen einen Termin ändern), oder auf
-"Löschen", um sie zu entfernen.
+Liste, inklusive Labels, Erinnerung und Versandzeitpunkt, mit denen sie gesendet
+würden. Zeilen mit Fehlern (z.B. ungültiges Datum oder kein ausgewähltes Label) sind
+rot markiert und mit einer Fehlermeldung versehen - klicke auf "Bearbeiten", um sie zu
+korrigieren (dort lassen sich auch Labels, Erinnerung und Versandzeitpunkt für diesen
+einen Termin ändern), oder auf "Löschen", um sie zu entfernen.
 
 Erst wenn du auf **"Alle fehlerfreien Termine senden"** klickst, werden die Termine
 tatsächlich an Groupalarm übermittelt. Fehlerhafte Zeilen werden dabei übersprungen
