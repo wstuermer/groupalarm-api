@@ -8,6 +8,7 @@ require_login();
 $userId = (int) current_user()['id'];
 $defaultLabelIds = groupalarm_get_label_ids($userId);
 $defaultReminderMinutes = groupalarm_get_default_reminder_minutes($userId);
+$defaultNotificationOffsetMinutes = groupalarm_get_default_notification_offset_minutes($userId);
 
 $fields = [
     'date' => '',
@@ -17,6 +18,7 @@ $fields = [
     'description' => '',
     'label_ids' => $defaultLabelIds,
     'reminder_minutes' => $defaultReminderMinutes,
+    'notification_offset_minutes' => $defaultNotificationOffsetMinutes,
 ];
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -35,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             ? $defaultLabelIds
             : array_values(array_map('intval', is_array($postedLabelIds) ? $postedLabelIds : [])),
         'reminder_minutes' => normalize_reminder_minutes($_POST['reminder_minutes'] ?? ''),
+        'notification_offset_minutes' => normalize_notification_offset_minutes($_POST['notification_offset_minutes'] ?? ''),
     ];
 
     $row = make_draft_row($fields, 'manual');
@@ -87,6 +90,16 @@ require __DIR__ . '/../templates/header.php';
         <?php endforeach; ?>
     </select>
     <p class="field-hint">Vorbelegt mit der Standard-Erinnerung aus den Einstellungen.</p>
+
+    <label for="notification_offset_minutes">Versandzeitpunkt</label>
+    <select id="notification_offset_minutes" name="notification_offset_minutes">
+        <?php foreach (NOTIFICATION_OFFSET_OPTIONS as $value => $label): ?>
+        <option value="<?= h((string) $value) ?>" <?= $value === ($fields['notification_offset_minutes'] ?? '') ? 'selected' : '' ?>>
+            <?= h($label) ?>
+        </option>
+        <?php endforeach; ?>
+    </select>
+    <p class="field-hint">Wann die Einladung selbst verschickt wird. Vorbelegt mit dem Standard-Versandzeitpunkt aus den Einstellungen.</p>
 
     <label for="label_ids">Labels</label>
     <?php if ($availableLabels): ?>

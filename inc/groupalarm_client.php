@@ -40,6 +40,21 @@ function groupalarm_get_default_reminder_minutes(int $userId): ?int
 }
 
 /**
+ * The user's default "Versandzeitpunkt" offset (minutes before an appointment at
+ * which invitations should go out, or null for "nicht gesetzt"/sofort) for newly
+ * created appointments. Unlike groupalarm_get_default_reminder_minutes(), there is
+ * no legacy hardcoded fallback to preserve here - null is the correct default in
+ * both cases (never configured, or explicitly set to "nicht gesetzt").
+ */
+function groupalarm_get_default_notification_offset_minutes(int $userId): ?int
+{
+    $row = groupalarm_get_settings_row($userId);
+    return $row !== null && $row['default_notification_offset_minutes'] !== null
+        ? (int) $row['default_notification_offset_minutes']
+        : null;
+}
+
+/**
  * Decrypts and returns the user's Groupalarm Personal-Access-Token, or null if none
  * is stored / decryption fails. Only call this right before an actual API send.
  */
@@ -71,14 +86,34 @@ function groupalarm_to_utc_timestamp(string $date, string $time): string
 }
 
 /**
- * Builds the JSON-ready payload array for one appointment. Labels and the reminder
- * are per-row (each draft row carries its own label_ids/reminder_minutes, editable
- * in the review view) - isPublic/keepLabelParticipantsInSync are fixed to sensible
- * defaults, not part of this app's scope.
+ * Like groupalarm_to_utc_timestamp(), but for a point in time a given number of
+ * minutes before the appointment's local start - used for the "notificationDate"
+ * payload field (when Groupalarm should first send out invitations). The offset is
+ * subtracted in Europe/Berlin local time before converting to UTC, so DST
+ * transitions between now and the appointment are handled the same correct way as
+ * the start/end timestamps.
+ */
+function groupalarm_notification_utc_timestamp(string $date, string $startTime, int $offsetMinutes): string
+{
+    $local = new DateTime("{$date} {$startTime}:00", new DateTimeZone('Europe/Berlin'));
+    $local->modify("-{$offsetMinutes} minutes");
+    $local->setTimezone(new DateTimeZone('UTC'));
+
+    return $local->format('Y-m-d\TH:i:s\Z');
+}
+
+/**
+ * Builds the JSON-ready payload array for one appointment. Labels, the reminder, and
+ * the Versandzeitpunkt are all per-row (each draft row carries its own
+ * label_ids/reminder_minutes/notification_offset_minutes, editable in the review
+ * view) - isPublic/keepLabelParticipantsInSync are fixed to sensible defaults, not
+ * part of this app's scope.
  *
  * A null reminder_minutes ("keine Erinnerung") omits the "reminder" key entirely
  * rather than sending 0, since Groupalarm's API treats reminder as nullable - 0
- * would mean "remind immediately", not "don't remind at all".
+ * would mean "remind immediately", not "don't remind at all". Likewise, a null
+ * notification_offset_minutes ("nicht gesetzt") omits "notificationDate" entirely,
+ * so Groupalarm sends invitations immediately at creation (its own default).
  */
 function groupalarm_build_payload(array $row, int $organizationId): array
 {
@@ -97,6 +132,14 @@ function groupalarm_build_payload(array $row, int $organizationId): array
 
     if (($row['reminder_minutes'] ?? null) !== null) {
         $payload['reminder'] = (int) $row['reminder_minutes'];
+    }
+
+    if (($row['notification_offset_minutes'] ?? null) !== null) {
+        $payload['notificationDate'] = groupalarm_notification_utc_timestamp(
+            $row['date'],
+            $row['start_time'],
+            (int) $row['notification_offset_minutes']
+        );
     }
 
     return $payload;

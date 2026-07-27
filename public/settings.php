@@ -37,6 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $labelsUnavailable = ($_POST['label_ids_unavailable'] ?? '') === '1';
         $labelIdsRaw = $_POST['label_ids'] ?? [];
         $reminderMinutes = normalize_reminder_minutes($_POST['reminder_minutes'] ?? '');
+        $notificationOffsetMinutes = normalize_notification_offset_minutes($_POST['notification_offset_minutes'] ?? '');
 
         $labelIds = array_values(array_filter(array_map(
             fn ($v) => (int) $v,
@@ -49,11 +50,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo = db();
             $pdo->beginTransaction();
             $pdo->prepare(
-                'INSERT INTO groupalarm_settings (user_id, organization_id, default_reminder_minutes) VALUES (?, ?, ?)
+                'INSERT INTO groupalarm_settings
+                    (user_id, organization_id, default_reminder_minutes, default_notification_offset_minutes)
+                 VALUES (?, ?, ?, ?)
                  ON DUPLICATE KEY UPDATE
                     organization_id = VALUES(organization_id),
-                    default_reminder_minutes = VALUES(default_reminder_minutes)'
-            )->execute([$userId, (int) $organizationId, $reminderMinutes]);
+                    default_reminder_minutes = VALUES(default_reminder_minutes),
+                    default_notification_offset_minutes = VALUES(default_notification_offset_minutes)'
+            )->execute([$userId, (int) $organizationId, $reminderMinutes, $notificationOffsetMinutes]);
 
             // If the label picker couldn't be loaded from Groupalarm, its selection is
             // meaningless (empty/disabled) - leave the previously saved labels untouched
@@ -70,8 +74,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $pdo->commit();
 
             flash_set('success', $labelsUnavailable
-                ? 'Organisation-ID und Erinnerung gespeichert. Labels konnten nicht von Groupalarm geladen werden und wurden daher nicht verändert.'
-                : 'Organisation, Labels und Erinnerung gespeichert.');
+                ? 'Organisation-ID, Erinnerung und Versandzeitpunkt gespeichert. Labels konnten nicht von Groupalarm geladen werden und wurden daher nicht verändert.'
+                : 'Organisation, Labels, Erinnerung und Versandzeitpunkt gespeichert.');
         }
     } elseif ($action === 'update_token') {
         $token = trim((string) ($_POST['api_token'] ?? ''));
@@ -103,6 +107,7 @@ $labelIds = groupalarm_get_label_ids($userId);
 $labelsResult = groupalarm_get_labels_for_user($userId);
 $availableLabels = $labelsResult['labels'];
 $reminderMinutes = groupalarm_get_default_reminder_minutes($userId);
+$notificationOffsetMinutes = groupalarm_get_default_notification_offset_minutes($userId);
 $hasToken = $settingsRow !== null && $settingsRow['api_token_ciphertext'] !== null;
 $tokenUpdatedAt = $hasToken ? $settingsRow['updated_at'] : null;
 
@@ -128,7 +133,7 @@ require __DIR__ . '/../templates/header.php';
     <button type="submit">Passwort ändern</button>
 </form>
 
-<h2>Groupalarm Organisation, Labels &amp; Erinnerung</h2>
+<h2>Groupalarm-Einstellungen</h2>
 <form class="card" method="post" action="settings.php">
     <?php csrf_field(); ?>
     <input type="hidden" name="action" value="update_groupalarm">
@@ -144,7 +149,24 @@ require __DIR__ . '/../templates/header.php';
         </option>
         <?php endforeach; ?>
     </select>
-    <p class="field-hint">Wird jedem neuen Termin standardmäßig zugeordnet, ist aber pro Termin änderbar.</p>
+    <p class="field-hint">
+        Push-Erinnerung an Teilnehmer, die noch nicht reagiert haben. Wird jedem neuen
+        Termin standardmäßig zugeordnet, ist aber pro Termin änderbar.
+    </p>
+
+    <label for="notification_offset_minutes">Standard-Versandzeitpunkt</label>
+    <select id="notification_offset_minutes" name="notification_offset_minutes">
+        <?php foreach (NOTIFICATION_OFFSET_OPTIONS as $value => $label): ?>
+        <option value="<?= h((string) $value) ?>" <?= $value === ($notificationOffsetMinutes ?? '') ? 'selected' : '' ?>>
+            <?= h($label) ?>
+        </option>
+        <?php endforeach; ?>
+    </select>
+    <p class="field-hint">
+        Wann die Termin-Einladung selbst verschickt wird (statt sofort bei Erstellung)
+        - nicht zu verwechseln mit der Erinnerung oben. Wird jedem neuen Termin
+        standardmäßig zugeordnet, ist aber pro Termin änderbar.
+    </p>
 
     <label for="label_ids">Labels</label>
     <?php if ($availableLabels): ?>

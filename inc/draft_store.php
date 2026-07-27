@@ -23,6 +23,7 @@ function make_draft_row(array $fields, string $source, array $extraErrors = [], 
         'reminder_minutes' => normalize_reminder_minutes(
             array_key_exists('reminder_minutes', $fields) ? $fields['reminder_minutes'] : DEFAULT_APPOINTMENT_REMINDER_MINUTES
         ),
+        'notification_offset_minutes' => normalize_notification_offset_minutes($fields['notification_offset_minutes'] ?? null),
         'source' => $source,
         'line_number' => $lineNumber,
     ];
