@@ -4,6 +4,14 @@ Diese Anleitung ist für alle gedacht, die Termine (Übungsdienste etc.) über d
 Web-Oberfläche bei Groupalarm anlegen dürfen. Sie bekommen diese Anleitung zusammen mit
 einer Einladungs-Mail vom Admin.
 
+Die Anwendung wird als fertig eingerichteter **SaaS-Dienst** unter
+`https://groupalarm.kerneloops.de/` bereitgestellt - eine eigene Installation ist also
+nicht nötig. Wer die Anwendung für die eigene Organisation nutzen möchte, schickt eine
+E-Mail mit **Name und Organisation** an
+[groupalarm@ffw-bliesheim.de](mailto:groupalarm@ffw-bliesheim.de) und nennt darin die
+E-Mail-Adresse, mit der der Account registriert werden soll. Selbstverständlich kann die
+Anwendung auch selbst gehostet werden (siehe [`README.md`](../README.md)).
+
 ---
 
 ## 1. Zugang erhalten
@@ -13,7 +21,7 @@ einer Einladungs-Mail vom Admin.
 3. Klick auf den Link, vergib dort dein Passwort (mindestens 10 Zeichen).
 4. Du bist danach direkt eingeloggt.
 
-Die Adresse der Anwendung lautet: `<ADRESSE VOM ADMIN EINTRAGEN>`
+Die Adresse der Anwendung lautet: `https://groupalarm.kerneloops.de/`
 
 ---
 
