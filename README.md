@@ -9,6 +9,17 @@ Termine landen zunächst in einer Entwurfsliste, werden dort validiert und lasse
 sich vor dem eigentlichen Versand noch einzeln korrigieren. Nichts wird ungeprüft
 sofort an Groupalarm übermittelt.
 
+## SaaS oder Self-Hosted
+
+Die Anwendung steht als **fertig eingerichteter SaaS-Dienst** unter
+[https://groupalarm.kerneloops.de/](https://groupalarm.kerneloops.de/) bereit - kein
+eigenes Hosting, keine Installation nötig. Für die Registrierung genügt eine kurze
+E-Mail mit **Name und Organisation** sowie der gewünschten Account-E-Mail-Adresse an
+[groupalarm@ffw-bliesheim.de](mailto:groupalarm@ffw-bliesheim.de).
+
+Wer die Anwendung stattdessen selbst betreiben möchte, kann das - siehe
+[Installation](#installation) weiter unten.
+
 ## Features
 
 - **Termine anlegen** - einzeln per Formular oder gebündelt per Textdatei-Upload
